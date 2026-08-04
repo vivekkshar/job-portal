@@ -1,0 +1,155 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+
+import Sidebar from "../../components/recruiter/Sidebar";
+import useGetAdminJobs from "../../hooks/useGetAdminJobs";
+import toast from "react-hot-toast";
+import API from "../../services/axios";
+
+const Jobs = () => {
+  const { fetchAdminJobs } = useGetAdminJobs();
+  const navigate = useNavigate();
+  const { adminJobs = [], loading } = useSelector((store) => store.job);
+  const [search, setSearch] = useState("");
+
+  const formatSalary = (value) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(value || 0);
+
+  const deleteJobHandler = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this job?");
+
+    if (!confirmDelete) return;
+
+    try {
+      const res = await API.delete(`/jobs/${id}`);
+
+      if (res.data.success) {
+        toast.success(res.data.message);
+        await fetchAdminJobs();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete job");
+    }
+  };
+
+  const filteredJobs = adminJobs.filter((job) => {
+    const searchText = search.toLowerCase();
+
+    return (
+      job?.title?.toLowerCase().includes(searchText) ||
+      job?.company?.name?.toLowerCase().includes(searchText) ||
+      job?.location?.toLowerCase().includes(searchText)
+    );
+  });
+
+  return (
+    <div className="min-h-screen flex bg-gray-100">
+      <Sidebar />
+
+      <div className="flex-1 p-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold">My Jobs</h1>
+            <p className="text-gray-500 mt-1">
+              {filteredJobs.length} {filteredJobs.length === 1 ? "job" : "jobs"} shown
+            </p>
+          </div>
+
+          <Link
+            to="/admin/job/create"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition"
+          >
+            + New Job
+          </Link>
+        </div>
+
+        <div className="bg-white rounded-xl shadow p-5 mb-6">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by job title, company or location..."
+            className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {loading ? (
+          <div className="bg-white rounded-xl shadow p-8 text-center">
+            <h2 className="text-lg font-semibold">Loading jobs...</h2>
+          </div>
+        ) : filteredJobs.length === 0 ? (
+          <div className="bg-white rounded-xl shadow p-8 text-center">
+            <p className="text-gray-500 text-lg">
+              {search ? "No jobs match your search" : "You haven't posted any jobs yet."}
+            </p>
+            {!search && (
+              <Link
+                to="/admin/job/create"
+                className="inline-block mt-4 text-blue-600 font-semibold"
+              >
+                Create your first job
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="overflow-x-auto bg-white rounded-xl shadow">
+            <table className="w-full">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="text-left p-4">Job Title</th>
+                  <th className="text-left p-4">Company</th>
+                  <th className="text-left p-4">Location</th>
+                  <th className="text-left p-4">Salary</th>
+                  <th className="text-left p-4">Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredJobs.map((job) => (
+                  <tr key={job._id} className="border-t hover:bg-gray-50">
+                    <td className="p-4 font-medium">{job.title}</td>
+                    <td className="p-4">{job.company?.name || "N/A"}</td>
+                    <td className="p-4">{job.location || "N/A"}</td>
+                    <td className="p-4">{formatSalary(job.salary)}</td>
+
+                    <td className="p-4">
+                      <div className="flex gap-2 flex-wrap">
+                        <button
+                          onClick={() => navigate(`/admin/job/${job._id}/edit`)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          onClick={() => deleteJobHandler(job._id)}
+                          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                        >
+                          Delete
+                        </button>
+
+                        <button
+                          onClick={() => navigate(`/admin/job/${job._id}/applicants`)}
+                          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                        >
+                          Applicants
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Jobs;
