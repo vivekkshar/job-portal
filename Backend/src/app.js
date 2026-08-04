@@ -32,7 +32,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://job-portal-virid-xi.vercel.app/",
+      "https://job-portal-virid-xi.vercel.app",
 
     ],
     credentials: true,
