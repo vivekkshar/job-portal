@@ -4,9 +4,11 @@ import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
 import API from "../services/axios";
+
 import {
   setJobs,
   setLoading,
+  setPagination,
 } from "../redux/slices/jobSlice";
 
 const useGetAllJobs = (filters = {}) => {
@@ -47,13 +49,17 @@ const useGetAllJobs = (filters = {}) => {
         );
 
         if (res.data.success) {
-          dispatch(setJobs(res.data.jobs));
+          // Jobs
+          dispatch(setJobs(res.data.jobs || []));
 
-          return {
-            totalJobs: res.data.totalJobs,
-            totalPages: res.data.totalPages,
-            currentPage: res.data.page,
-          };
+          // Pagination data
+          dispatch(
+            setPagination({
+              totalJobs: res.data.totalJobs || 0,
+              totalPages: res.data.totalPages || 1,
+              currentPage: res.data.page || 1,
+            })
+          );
         }
       } catch (error) {
         toast.error(
@@ -77,4 +83,3 @@ const useGetAllJobs = (filters = {}) => {
 };
 
 export default useGetAllJobs;
-

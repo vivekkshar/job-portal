@@ -24,6 +24,8 @@ import RecruiterRoute from "./components/auth/RecruiterRoute";
 import useGetCurrentUser from "./hooks/useGetCurrentUser";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import MyApplications from "./pages/user/MyApplications";
+import Dashboard1 from "./pages/user/Dashboard";
 import "./App.css";
 
 function App() {
@@ -47,6 +49,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/dashboard" element={ <ProtectedRoute allowedRoles={["jobseeker"]}> <Dashboard /> </ProtectedRoute> } />
           <Route
             path="/profile/edit"
             element={
@@ -55,18 +58,12 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/my-applications" element={<MyApplications />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/applications" element={<AppliedJobs />} />
           {/* Recruiter */}
-          <Route
-            path="/admin/dashboard"
-            element={
-              <RecruiterRoute>
-                <Dashboard />
-              </RecruiterRoute>
-            }
-          />
+          <Route path="/admin/dashboard" element={ <ProtectedRoute allowedRoles={["recruiter", "admin"]}> <Dashboard /> </ProtectedRoute> } />
           <Route
             path="/admin/companies"
             element={

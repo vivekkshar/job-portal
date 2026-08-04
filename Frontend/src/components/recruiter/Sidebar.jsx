@@ -12,7 +12,7 @@ const Sidebar = () => {
 
         <NavLink to="/admin/jobs">Jobs</NavLink>
 
-        <NavLink to="/admin/applicants">Applicants</NavLink>
+        {/* <NavLink to="/admin/applicants">Applicants</NavLink> */}
       </nav>
     </div>
   );

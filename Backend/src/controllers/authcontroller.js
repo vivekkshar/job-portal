@@ -4,6 +4,7 @@ import User from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cloudinary from "../config/cloudinary.js";
+import transporter from "../config/emai.js";
 import getDataUri from "../utils/dataUri.js";
 import crypto from "crypto";
 
@@ -242,6 +243,7 @@ export const updateProfile = async (req, res) => {
 };
 
 
+// id="4njx1q"
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -257,7 +259,7 @@ export const forgotPassword = async (req, res) => {
       email: email.toLowerCase().trim(),
     });
 
-    
+    // Security: don't reveal whether email exists
     if (!user) {
       return res.status(200).json({
         success: true,
@@ -266,10 +268,10 @@ export const forgotPassword = async (req, res) => {
       });
     }
 
-    
+    // Generate secure token
     const resetToken = crypto.randomBytes(32).toString("hex");
 
-    
+    // Hash token before storing in DB
     const hashedToken = crypto
       .createHash("sha256")
       .update(resetToken)
@@ -277,31 +279,97 @@ export const forgotPassword = async (req, res) => {
 
     user.resetPasswordToken = hashedToken;
 
-    
-    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+    // Token valid for 15 minutes
+    user.resetPasswordExpire =
+      Date.now() + 15 * 60 * 1000;
 
     await user.save();
 
-    
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    // Frontend reset URL
+    const resetUrl =
+      `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-    console.log("PASSWORD RESET URL:", resetUrl);
+    // Send email
+    await transporter.sendMail({
+      from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: "Job Portal - Password Reset",
+      html: `
+        <div style="
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: auto;
+          padding: 30px;
+          border: 1px solid #ddd;
+          border-radius: 10px;
+        ">
+
+          <h2 style="color: #2563eb;">
+            Reset Your Password
+          </h2>
+
+          <p>
+            Hello ${user.fullName},
+          </p>
+
+          <p>
+            We received a request to reset your Job Portal password.
+          </p>
+
+          <p>
+            Click the button below to create a new password.
+          </p>
+
+          <a
+            href="${resetUrl}"
+            style="
+              display: inline-block;
+              padding: 12px 20px;
+              background-color: #2563eb;
+              color: white;
+              text-decoration: none;
+              border-radius: 6px;
+              margin: 15px 0;
+            "
+          >
+            Reset Password
+          </a>
+
+          <p>
+            This link will expire in <strong>15 minutes</strong>.
+          </p>
+
+          <p>
+            If you did not request a password reset,
+            you can safely ignore this email.
+          </p>
+
+          <hr />
+
+          <p style="color: #777; font-size: 12px;">
+            Job Portal
+          </p>
+
+        </div>
+      `,
+    });
 
     return res.status(200).json({
       success: true,
       message:
         "If an account exists with this email, a password reset link will be sent.",
-      resetUrl,
     });
+
   } catch (error) {
     console.error("Forgot password error:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Something went wrong",
+      message: "Unable to send password reset email",
     });
   }
 };
+
 
 
 export const resetPassword = async (req, res) => {

@@ -1,12 +1,12 @@
 import Application from "../models/Application.js";
-
+import User from "../models/user.js";
 import Job from "../models/jobs.js";
+import transporter from "../config/emai.js";
 
 export const applyJob = async (req, res) => {
   try {
     const { jobId } = req.params;
-
-    // Check Job Exists
+    
     const job = await Job.findById(jobId);
 
     if (!job) {
@@ -16,7 +16,7 @@ export const applyJob = async (req, res) => {
       });
     }
 
-    // Check Duplicate Application
+    
     const alreadyApplied = await Application.findOne({
       applicant: req.user._id,
       job: jobId,
@@ -29,13 +29,84 @@ export const applyJob = async (req, res) => {
       });
     }
 
+    // Get applicant details
+    const applicant = await User.findById(req.user._id);
+
+    // Get recruiter details
+    const recruiter = await User.findById(job.createdBy);
+
     // Create Application
     const application = await Application.create({
       applicant: req.user._id,
       job: jobId,
     });
 
-    res.status(201).json({
+    // Send email to recruiter
+    if (recruiter?.email) {
+      await transporter.sendMail({
+        from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+        to: recruiter.email,
+        subject: `New Application for ${job.title}`,
+        html: `
+          <div style="
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+          ">
+
+            <h2 style="color: #2563eb;">
+              New Job Application
+            </h2>
+
+            <p>
+              Hello ${recruiter.fullName},
+            </p>
+
+            <p>
+              You have received a new application for:
+            </p>
+
+            <h3>
+              ${job.title}
+            </h3>
+
+            <hr />
+
+            <p>
+              <strong>Applicant:</strong>
+              ${applicant?.fullName || "N/A"}
+            </p>
+
+            <p>
+              <strong>Email:</strong>
+              ${applicant?.email || "N/A"}
+            </p>
+
+            <p>
+              <strong>Application Status:</strong>
+              Pending
+            </p>
+
+            <p style="margin-top: 25px;">
+              Please login to your Job Portal recruiter dashboard
+              to view the complete application and resume.
+            </p>
+
+            <hr />
+
+            <p style="color: #777; font-size: 12px;">
+              Job Portal
+            </p>
+
+          </div>
+        `,
+      });
+    }
+
+    return res.status(201).json({
       success: true,
       message: "Applied Successfully",
       application,
@@ -51,13 +122,14 @@ export const applyJob = async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    console.error("Apply job error:", error);
+
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
-
 
 export const getMyApplications = async (req, res) => {
   try {
@@ -132,6 +204,7 @@ export const getJobApplicants = async (req, res) => {
   }
 };
 
+
 export const updateApplicationStatus = async (req, res) => {
   try {
     const { applicationId } = req.params;
@@ -151,8 +224,10 @@ export const updateApplicationStatus = async (req, res) => {
       });
     }
 
+    // Get application + applicant + job
     const application = await Application.findById(applicationId)
-      .populate("job");
+      .populate("job")
+      .populate("applicant", "fullName email");
 
     if (!application) {
       return res.status(404).json({
@@ -172,9 +247,86 @@ export const updateApplicationStatus = async (req, res) => {
       });
     }
 
+    // Update status
     application.status = status;
 
     await application.save();
+
+    // Send email to applicant
+    if (application.applicant?.email) {
+      await transporter.sendMail({
+        from: `"Job Portal" <${process.env.EMAIL_USER}>`,
+        to: application.applicant.email,
+        subject: `Application Update - ${application.job.title}`,
+
+        html: `
+          <div style="
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+          ">
+
+            <h2 style="color: #2563eb;">
+              Application Status Update
+            </h2>
+
+            <p>
+              Hello ${application.applicant.fullName},
+            </p>
+
+            <p>
+              Your application status has been updated.
+            </p>
+
+            <h3>
+              ${application.job.title}
+            </h3>
+
+            <p>
+              <strong>New Status:</strong>
+              ${status}
+            </p>
+
+            ${
+              status === "Shortlisted"
+                ? `
+                  <p style="color: green;">
+                    🎉 Congratulations! You have been shortlisted
+                    for the next stage of the recruitment process.
+                  </p>
+                `
+                : ""
+            }
+
+            ${
+              status === "Rejected"
+                ? `
+                  <p style="color: #dc2626;">
+                    Thank you for your interest. Unfortunately,
+                    your application was not selected at this time.
+                  </p>
+                `
+                : ""
+            }
+
+            <p style="margin-top: 25px;">
+              Login to your Job Portal account to check
+              your application details.
+            </p>
+
+            <hr />
+
+            <p style="color: #777; font-size: 12px;">
+              Job Portal
+            </p>
+
+          </div>
+        `,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -184,10 +336,11 @@ export const updateApplicationStatus = async (req, res) => {
 
   } catch (error) {
 
+    console.error("Update application status error:", error);
+
     return res.status(500).json({
       success: false,
       message: error.message,
     });
-
   }
 };

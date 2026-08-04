@@ -1,5 +1,6 @@
 import Job from "../models/jobs.js";
 import Company from "../models/Company.js";
+import axios from "axios";
 
 
 export const createJob = async (req, res) => {
@@ -298,5 +299,61 @@ export const getMyJobs = async (req, res) => {
       message: error.message,
     });
 
+  }
+};
+
+export const getExternalJobs = async (req, res) => {
+  try {
+    const {
+      keyword = "",
+      location = "",
+      page = 1,
+    } = req.query;
+
+    const response = await axios.get(
+      "https://www.arbeitnow.com/api/job-board-api",
+      {
+        params: {
+          page,
+        },
+      }
+    );
+
+    let jobs = response.data.data || [];
+
+    // Keyword filter
+    if (keyword) {
+      const search = keyword.toLowerCase();
+
+      jobs = jobs.filter((job) =>
+        `${job.title} ${job.description}`
+          .toLowerCase()
+          .includes(search)
+      );
+    }
+
+    // Location filter
+    if (location) {
+      const searchLocation = location.toLowerCase();
+
+      jobs = jobs.filter((job) =>
+        job.location
+          ?.toLowerCase()
+          .includes(searchLocation)
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      totalJobs: jobs.length,
+      jobs,
+    });
+  } catch (error) {
+    console.error("External Jobs API Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch external jobs",
+    });
   }
 };
