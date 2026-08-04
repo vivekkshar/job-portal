@@ -30,7 +30,11 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://job-portal-virid-xi.vercel.app/",
+
+    ],
     credentials: true,
   })
 );
