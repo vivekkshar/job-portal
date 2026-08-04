@@ -1,15 +1,13 @@
-import Company from "../models/Company.js"
+import Company from "../models/Company.js";
 
-
-export const  createCompany = async (req, res) => {
-     try {
-
-    const { name } = req.body;
+export const createCompany = async (req, res) => {
+  try {
+    const { name } = req.body || {};
 
     if (!name) {
       return res.status(400).json({
         success: false,
-        message: "Company name is required"
+        message: "Company name is required",
       });
     }
 
@@ -18,84 +16,97 @@ export const  createCompany = async (req, res) => {
     if (companyExists) {
       return res.status(400).json({
         success: false,
-        message: "Company already exists"
+        message: "Company already exists",
       });
     }
 
     const company = await Company.create({
       name,
-      owner: req.user._id
+      owner: req.user._id,
     });
 
     res.status(201).json({
       success: true,
       message: "Company Created Successfully",
-      company
+      company,
     });
-
   } catch (error) {
-
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
-
   }
-
-}
+};
 
 export const getMyCompanies = async (req, res) => {
-
   try {
-
     const companies = await Company.find({
-      owner: req.user._id
+      owner: req.user._id,
     });
 
     res.status(200).json({
       success: true,
-      companies
+      companies,
     });
-
   } catch (error) {
-
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
-
   }
-
 };
 
-export const updateCompany = async (req, res) => {
-
+export const getCompanyById = async (req, res) => {
   try {
-
     const company = await Company.findById(req.params.id);
 
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: "Company not found"
+        message: "Company not found",
       });
     }
 
     if (company.owner.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Unauthorized"
+        message: "Unauthorized",
       });
     }
 
-    const fields = [
-      "description",
-      "website",
-      "location",
-      "logo"
-    ];
+    res.status(200).json({
+      success: true,
+      company,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-    fields.forEach(field => {
+export const updateCompany = async (req, res) => {
+  try {
+    const company = await Company.findById(req.params.id);
+
+    if (!company) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
+
+    if (company.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const fields = ["name", "description", "website", "location"];
+
+    fields.forEach((field) => {
       if (req.body[field] !== undefined) {
         company[field] = req.body[field];
       }
@@ -106,17 +117,12 @@ export const updateCompany = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Company Updated",
-      company
+      company,
     });
-
   } catch (error) {
-
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
-
   }
-
 };
-

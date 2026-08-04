@@ -1,5 +1,5 @@
 import express from "express"
-import { register, login, getme, logout } from "../controllers/authcontroller.js"
+import { register, login, getme, logout, forgotPassword, resetPassword } from "../controllers/authcontroller.js"
 import { isAuthenticated } from "../middleware/authmiddleware.js"
 import  upload  from "../middleware/uploadMiddleware.js";
 import { updateProfile } from "../controllers/authController.js";
@@ -11,7 +11,12 @@ import validate from "../middleware/validate.js";
 
 const router = express.Router()
 
-router.post("/register", registerValidation, validate, register)
+router.post(
+  "/register",
+  upload.single("file"),
+  validate(registerValidation),
+  register
+);
 router.post("/login", login)
 router.get("/me", isAuthenticated, getme)
 router.get("/logout", isAuthenticated, logout)
@@ -31,6 +36,9 @@ router.put(
   ]),
   updateProfile
 );
+
+router.post("/forgot-password", forgotPassword )
+router.post( "/reset-password/:token", resetPassword );
 
 
 
