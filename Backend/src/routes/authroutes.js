@@ -2,7 +2,7 @@ import express from "express"
 import { register, login, getme, logout, forgotPassword, resetPassword } from "../controllers/authcontroller.js"
 import { isAuthenticated } from "../middleware/authmiddleware.js"
 import  upload  from "../middleware/uploadMiddleware.js";
-import { updateProfile } from "../controllers/authController.js";
+import { updateProfile } from "../controllers/authcontroller.js";
 import { registerValidation} from "../validators/authValidator.js";
 import validate from "../middleware/validate.js";
 
