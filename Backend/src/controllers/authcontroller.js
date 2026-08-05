@@ -8,6 +8,14 @@ import transporter from "../config/emai.js";
 import getDataUri from "../utils/dataUri.js";
 import crypto from "crypto";
 
+const getCookieOptions = () => ({
+  httpOnly: true,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: "/",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  secure: process.env.NODE_ENV === "production",
+});
+
 export const register = async (req, res) => {
   try {
     const { fullName, email, password, role } = req.body;
@@ -52,10 +60,7 @@ export const register = async (req, res) => {
     );
 
     // Send cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("token", token, getCookieOptions());
 
     return res.status(201).json({
       success: true,
@@ -117,10 +122,7 @@ export const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("token", token, getCookieOptions());
 
     return res.status(200).json({
       success: true,
@@ -151,7 +153,7 @@ export const getme = async (req, res) => {
 
 export const logout = (req, res) => {
   res.cookie("token", "", {
-    httpOnly: true,
+    ...getCookieOptions(),
     expires: new Date(0),
   });
 

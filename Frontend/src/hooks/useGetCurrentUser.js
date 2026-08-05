@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import API from "../services/axios";
-import { setUser, setAuthLoading } from "../redux/slices/authSlice";
+import { setUser, setAuthLoading, logoutUser } from "../redux/slices/authSlice";
 
 const useGetCurrentUser = () => {
   const dispatch = useDispatch();
@@ -13,11 +13,13 @@ const useGetCurrentUser = () => {
       try {
         const res = await API.get("/auth/me");
 
-        if (res.data.success) {
+        if (res.data.success && res.data.user) {
           dispatch(setUser(res.data.user));
+        } else {
+          dispatch(logoutUser());
         }
       } catch (error) {
-        console.log(error);
+        dispatch(logoutUser());
       } finally {
         dispatch(setAuthLoading(false));
       }
