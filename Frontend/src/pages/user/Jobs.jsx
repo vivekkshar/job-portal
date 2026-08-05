@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import JobCard from "../../components/job/JobCard";
@@ -18,10 +17,8 @@ const Jobs = () => {
   useGetAllJobs(filters);
 
   // External API Jobs
-  const {
-    externalJobs = [],
-    loading: externalLoading,
-  } = useGetExternalJobs(filters);
+  const { externalJobs = [], loading: externalLoading } =
+    useGetExternalJobs(filters);
 
   const {
     jobs = [],
@@ -90,7 +87,6 @@ const Jobs = () => {
 
   return (
     <section className="max-w-7xl mx-auto py-10 sm:py-16 px-3 sm:px-4">
-
       {/* Heading */}
       <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-10">
         Find Your Dream Job
@@ -98,9 +94,7 @@ const Jobs = () => {
 
       {/* Search & Filters */}
       <div className="bg-white rounded-xl shadow-md border p-4 sm:p-5 mb-8 sm:mb-10">
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-
           {/* Keyword */}
           <input
             type="text"
@@ -134,7 +128,6 @@ const Jobs = () => {
             <option value="Internship">Internship</option>
             <option value="Contract">Contract</option>
           </select>
-
         </div>
 
         {/* Clear */}
@@ -146,45 +139,31 @@ const Jobs = () => {
             Clear Filters
           </button>
         </div>
-
       </div>
 
       {/* ================= YOUR JOBS ================= */}
 
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">
-            Jobs on Our Platform
-          </h2>
+          <h2 className="text-2xl font-bold">Jobs on Our Platform</h2>
 
-          <span className="text-sm text-gray-500">
-            {jobs.length} jobs
-          </span>
+          <span className="text-sm text-gray-500">{jobs.length} jobs</span>
         </div>
 
         {/* Loading */}
         {loading ? (
           <div className="text-center py-10">
-            <p className="text-gray-500">
-              Loading jobs...
-            </p>
+            <p className="text-gray-500">Loading jobs...</p>
           </div>
         ) : jobs.length === 0 ? (
           <div className="bg-white rounded-xl border p-8 text-center">
-            <p className="text-gray-500">
-              No Jobs Available
-            </p>
+            <p className="text-gray-500">No Jobs Available</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
             {jobs.map((job) => (
-              <JobCard
-                key={job._id}
-                job={job}
-              />
+              <JobCard key={job._id} job={job} />
             ))}
-
           </div>
         )}
 
@@ -192,7 +171,6 @@ const Jobs = () => {
         {!loading && totalPages > 1 && (
           <>
             <div className="flex justify-center items-center gap-2 mt-12">
-
               {/* Previous */}
               <button
                 onClick={previousPage}
@@ -204,10 +182,9 @@ const Jobs = () => {
 
               {/* Page Numbers */}
               <div className="flex gap-2">
-
                 {Array.from(
                   { length: totalPages },
-                  (_, index) => index + 1
+                  (_, index) => index + 1,
                 ).map((pageNumber) => (
                   <button
                     key={pageNumber}
@@ -221,7 +198,6 @@ const Jobs = () => {
                     {pageNumber}
                   </button>
                 ))}
-
               </div>
 
               {/* Next */}
@@ -232,7 +208,6 @@ const Jobs = () => {
               >
                 Next →
               </button>
-
             </div>
 
             <p className="text-center text-sm text-gray-500 mt-4">
@@ -244,9 +219,10 @@ const Jobs = () => {
 
       {/* ================= EXTERNAL JOBS ================= */}
 
-      <div className="mt-12 sm:mt-16 lg:mt-20">
+      {/* ================= EXTERNAL JOBS ================= */}
 
-        <div className="mb-6 text-center sm:text-left">
+      <div className="mt-12 sm:mt-16 lg:mt-20">
+        <div className="mb-6 text-center sm:text-left px-1">
           <h2 className="text-xl sm:text-2xl font-bold">
             🌐 Jobs From External Sources
           </h2>
@@ -258,102 +234,174 @@ const Jobs = () => {
 
         {externalLoading ? (
           <div className="text-center py-10">
-            <p className="text-gray-500">
-              Loading external jobs...
-            </p>
+            <p className="text-gray-500">Loading external jobs...</p>
           </div>
         ) : externalJobs.length === 0 ? (
           <div className="bg-white rounded-xl border p-8 text-center">
-            <p className="text-gray-500">
-              No external jobs found.
-            </p>
+            <p className="text-gray-500">No external jobs found.</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {externalJobs.map((job, index) => (
               <div
                 key={job.slug || job.url || index}
-                className="bg-white rounded-xl shadow-md border p-4 sm:p-6 hover:shadow-lg transition flex flex-col min-h-full"
+                className="
+            bg-white
+            rounded-xl
+            shadow-md
+            border
+            p-4
+            sm:p-6
+            hover:shadow-lg
+            transition
+            flex
+            flex-col
+            h-full
+            min-w-0
+          "
               >
-
                 {/* External Badge */}
-                <div className="flex justify-between items-start gap-3">
-
-                  <span className="text-xs font-semibold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
+                <div className="flex flex-wrap items-start gap-2">
+                  <span className="text-[11px] sm:text-xs font-semibold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
                     External Job
                   </span>
 
                   {job.remote && (
-                    <span className="text-xs font-semibold bg-green-100 text-green-700 px-3 py-1 rounded-full">
+                    <span className="text-[11px] sm:text-xs font-semibold bg-green-100 text-green-700 px-3 py-1 rounded-full">
                       Remote
                     </span>
                   )}
-
                 </div>
 
                 {/* Title */}
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mt-4 break-words">
+                <h3
+                  className="
+            text-lg
+            sm:text-xl
+            font-bold
+            text-gray-900
+            mt-4
+            leading-snug
+            break-words
+            line-clamp-2
+          "
+                >
                   {job.title || "Job Title"}
                 </h3>
 
                 {/* Company */}
-                <p className="text-sm sm:text-base text-gray-600 mt-2 font-medium break-words">
+                <p
+                  className="
+            text-sm
+            sm:text-base
+            text-gray-600
+            mt-2
+            font-medium
+            break-words
+            line-clamp-2
+          "
+                >
                   {job.company_name || "Company"}
                 </p>
 
                 {/* Location */}
-                <p className="text-sm text-gray-500 mt-4">
+                <p
+                  className="
+            text-sm
+            text-gray-500
+            mt-4
+            break-words
+          "
+                >
                   📍 {job.location || "Location not specified"}
                 </p>
 
                 {/* Job Type */}
                 {job.job_types?.length > 0 && (
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p
+                    className="
+              text-sm
+              text-gray-500
+              mt-2
+              break-words
+            "
+                  >
                     💼 {job.job_types.join(", ")}
                   </p>
                 )}
 
                 {/* Description */}
                 <div
-                  className="text-sm text-gray-600 mt-4 line-clamp-3"
+                  className="
+              text-sm
+              text-gray-600
+              mt-4
+              leading-6
+              line-clamp-3
+              break-words
+            "
                   dangerouslySetInnerHTML={{
-                    __html:
-                      job.description ||
-                      "No description available.",
+                    __html: job.description || "No description available.",
                   }}
                 />
 
                 {/* Bottom */}
                 <div className="mt-auto pt-6">
-
-                  <div className="border-t pt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-
-                    <span className="text-xs text-gray-400 text-center sm:text-left">
+                  <div
+                    className="
+              border-t
+              pt-4
+              flex
+              flex-col
+              gap-3
+              sm:flex-row
+              sm:justify-between
+              sm:items-center
+            "
+                  >
+                    {/* Source */}
+                    <span
+                      className="
+                text-xs
+                text-gray-400
+                text-center
+                sm:text-left
+                break-words
+              "
+                    >
                       Source: Arbeitnow
                     </span>
 
+                    {/* Apply */}
                     <a
                       href={job.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold w-full sm:w-auto text-center"
+                      className="
+                  bg-blue-600
+                  hover:bg-blue-700
+                  text-white
+                  px-4
+                  py-2.5
+                  rounded-lg
+                  text-sm
+                  font-semibold
+                  w-full
+                  sm:w-auto
+                  text-center
+                  transition
+                  active:scale-95
+                "
                     >
                       Apply Now →
                     </a>
-
                   </div>
-
                 </div>
-
               </div>
             ))}
-
           </div>
         )}
-
       </div>
-
     </section>
   );
 };
