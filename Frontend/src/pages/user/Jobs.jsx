@@ -244,14 +244,14 @@ const Jobs = () => {
 
       {/* ================= EXTERNAL JOBS ================= */}
 
-      <div className="mt-20">
+      <div className="mt-12 sm:mt-16 lg:mt-20">
 
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold">
+        <div className="mb-6 text-center sm:text-left">
+          <h2 className="text-xl sm:text-2xl font-bold">
             🌐 Jobs From External Sources
           </h2>
 
-          <p className="text-gray-500 mt-1">
+          <p className="text-sm sm:text-base text-gray-500 mt-1">
             Explore additional opportunities from external job boards.
           </p>
         </div>
@@ -274,7 +274,7 @@ const Jobs = () => {
             {externalJobs.map((job, index) => (
               <div
                 key={job.slug || job.url || index}
-                className="bg-white rounded-xl shadow-md border p-4 sm:p-6 hover:shadow-lg transition flex flex-col"
+                className="bg-white rounded-xl shadow-md border p-4 sm:p-6 hover:shadow-lg transition flex flex-col min-h-full"
               >
 
                 {/* External Badge */}
@@ -293,12 +293,12 @@ const Jobs = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-bold text-gray-900 mt-4">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mt-4 break-words">
                   {job.title || "Job Title"}
                 </h3>
 
                 {/* Company */}
-                <p className="text-gray-600 mt-2 font-medium">
+                <p className="text-sm sm:text-base text-gray-600 mt-2 font-medium break-words">
                   {job.company_name || "Company"}
                 </p>
 
@@ -327,9 +327,9 @@ const Jobs = () => {
                 {/* Bottom */}
                 <div className="mt-auto pt-6">
 
-                  <div className="border-t pt-4 flex justify-between items-center">
+                  <div className="border-t pt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
 
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-gray-400 text-center sm:text-left">
                       Source: Arbeitnow
                     </span>
 
