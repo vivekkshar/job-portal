@@ -89,17 +89,17 @@ const Jobs = () => {
   };
 
   return (
-    <section className="max-w-7xl mx-auto py-16 px-4">
+    <section className="max-w-7xl mx-auto py-10 sm:py-16 px-3 sm:px-4">
 
       {/* Heading */}
-      <h2 className="text-3xl font-bold text-center mb-10">
+      <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-10">
         Find Your Dream Job
       </h2>
 
       {/* Search & Filters */}
-      <div className="bg-white rounded-xl shadow-md border p-5 mb-10">
+      <div className="bg-white rounded-xl shadow-md border p-4 sm:p-5 mb-8 sm:mb-10">
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
 
           {/* Keyword */}
           <input
@@ -126,7 +126,7 @@ const Jobs = () => {
             name="jobType"
             value={filters.jobType}
             onChange={changeHandler}
-            className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white w-full"
           >
             <option value="">All Job Types</option>
             <option value="Full-Time">Full-Time</option>
@@ -138,7 +138,7 @@ const Jobs = () => {
         </div>
 
         {/* Clear */}
-        <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex justify-start sm:justify-end">
           <button
             onClick={clearFilters}
             className="px-5 py-2 border rounded-lg hover:bg-gray-100"
@@ -274,7 +274,7 @@ const Jobs = () => {
             {externalJobs.map((job, index) => (
               <div
                 key={job.slug || job.url || index}
-                className="bg-white rounded-xl shadow-md border p-6 hover:shadow-lg transition flex flex-col"
+                className="bg-white rounded-xl shadow-md border p-4 sm:p-6 hover:shadow-lg transition flex flex-col"
               >
 
                 {/* External Badge */}
@@ -337,7 +337,7 @@ const Jobs = () => {
                       href={job.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold w-full sm:w-auto text-center"
                     >
                       Apply Now →
                     </a>
